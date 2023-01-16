@@ -1,0 +1,42 @@
+import PySimpleGUI as sg
+import os
+import openai
+
+# Create the layout for your GUI
+layout = [
+    [sg.Text("What is your question?")],
+    [sg.InputText()],
+    [sg.Button("Submit"), sg.Exit()]
+]
+
+# Create the window using the layout
+window = sg.Window("OpenAI", layout)
+
+# Get the api key
+api_key = os.environ.get("OPENAI_API_KEY", "urkeyhere")
+openai.api_key = api_key
+
+while True:
+    # Wait for an event (button press, etc.)
+    event, values = window.read()
+
+    # If the user clicks the submit button
+    if event == "Submit":
+        # Get the question from the input field
+        prompt = values[0]
+        completions = openai.Completion.create(
+            engine="text-davinci-002",
+            prompt=prompt,
+            max_tokens=1024,
+            n=1,
+            stop=None,
+            temperature=0.5,
+        )
+        answer = completions.choices[0].text
+        sg.Popup(answer)
+    # If the user clicks the exit button or closes the window
+    if event in (None, "Exit"):
+        break
+
+# Close the window
+window.close()
